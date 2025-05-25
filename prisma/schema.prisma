@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model TUser {
+  user_id  Int     @id @default(autoincrement())
+  email    String  @unique
+  password String
+  tasks    TTask[]
+}
+
+model TTask {
+  task_id     Int      @id @default(autoincrement())
+  user_id     Int
+  user        TUser    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  title       String
+  role_id     Int
+  role        MRole    @relation(fields: [role_id], references: [role_id], onDelete: Cascade)
+  char_id     Int
+  char        MChar    @relation(fields: [char_id], references: [char_id], onDelete: Cascade)
+  create_date DateTime
+  status_code Int
+  status      MStatus  @relation(fields: [status_code], references: [status_code], onDelete: Cascade)
+  comment     String
+}
+
+model MRole {
+  role_id   Int     @id
+  role_name String
+  tasks     TTask[]
+  chars     MChar[]
+}
+
+model MChar {
+  char_id   Int     @id
+  role_id   Int
+  role      MRole   @relation(fields: [role_id], references: [role_id], onDelete: Cascade)
+  char_name String
+  tasks     TTask[]
+}
+
+model MStatus {
+  status_code Int     @id
+  status_name String
+  tasks       TTask[]
+}
