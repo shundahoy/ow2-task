@@ -1,7 +1,30 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react"; // useEffect をインポート
 import { registerUser } from "../lib/actions/registerUser";
+import { useActionState } from "react";
+import { useRouter } from "next/navigation"; // useRouter をインポート
 
 const RegisterPage = () => {
+  const router = useRouter(); // useRouter を初期化
+
+  const initialState = {
+    errors: {
+      email: "",
+      password: "",
+    },
+    success: false,
+  };
+
+  const [state, dispatch] = useActionState(registerUser, initialState);
+
+  // state の変更を監視する useEffect フック
+  useEffect(() => {
+    if (state.success) {
+      alert("登録が完了しました！"); // 成功時にアラートを表示
+      router.push("/dashboard"); // アラートのOK後に /dashboard へ遷移
+    }
+  }, [state.success, router]); // state.success と router が変更されたときに実行
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
@@ -16,7 +39,7 @@ const RegisterPage = () => {
           </p>
         </div>
         <form
-          action={registerUser}
+          action={dispatch}
           className="lg:w-2/6 md:w-1/2 bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0"
         >
           <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
@@ -28,12 +51,14 @@ const RegisterPage = () => {
               メールアドレス
             </label>
             <input
-              required
               type="email"
               id="email"
               name="email"
               className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
+            {state.errors.email && (
+              <p className="text-red-500 text-sm mt-1">{state.errors.email}</p>
+            )}
           </div>
 
           <div className="relative mb-4">
@@ -44,12 +69,16 @@ const RegisterPage = () => {
               パスワード
             </label>
             <input
-              required
               type="password"
               id="password"
               name="password"
               className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
+            {state.errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {state.errors.password}
+              </p>
+            )}
           </div>
           <div className="flex flex-row gap-4">
             <button className="flex-1 text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
