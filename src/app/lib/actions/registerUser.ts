@@ -1,15 +1,25 @@
 "use server";
+import { RegisterFormState } from "@/app/(types)/type";
 import { PrismaClient } from "../../../generated/prisma/client";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 
-export async function registerUser(formData: FormData) {
+export async function registerUser(
+  prevState: RegisterFormState,
+  formData: FormData
+) {
   const prisma = new PrismaClient();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   if (!email || !password) {
-    throw new Error("メールアドレスとパスワードは必須です");
+    return {
+      errors: {
+        email: "emailは必須です",
+        password: "passwordは必須です",
+      },
+      isSuccess: false,
+    };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,5 +31,11 @@ export async function registerUser(formData: FormData) {
     },
   });
 
-  redirect("/login?register=true");
+  return {
+    errors: {
+      email: "",
+      password: "",
+    },
+    isSuccess: true,
+  };
 }
