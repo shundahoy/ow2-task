@@ -3,7 +3,7 @@ import { RegisterFormState } from "@/app/(types)/type";
 import { PrismaClient } from "../../../generated/prisma/client";
 import bcrypt from "bcrypt";
 import { authValidate } from "../validate/validate";
-import { signIn } from "../../../../auth";
+import { signIn } from "../../../auth";
 
 export async function registerUser(
   prevState: RegisterFormState,

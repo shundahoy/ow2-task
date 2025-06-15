@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaClient } from "./src/generated/prisma";
+import { PrismaClient } from "./generated/prisma";
 import { authValidate } from "@/app/lib/validate/validate";
 import bcrypt from "bcrypt";
 import { authConfig } from "./auth.config";
@@ -26,8 +26,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           // パスワードの検証
-          const hashedPassword = await bcrypt.hash(password, 10);
-          if (hashedPassword !== user.password) return null;
+          const isValid = await bcrypt.compare(password, user.password);
+          if (!isValid) return null;
+          console.log("isvalid" + isValid);
 
           // 認証成功時
           return {
