@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { registerUser } from "../lib/actions/registerUser";
 import { useActionState } from "react";
@@ -7,29 +7,25 @@ import { RegisterFormState } from "../(types)/type";
 
 const INITIAL_STATE: RegisterFormState = {
   errors: {
-    email: "",
-    password: "",
+    email: [],
+    password: [],
   },
   isSuccess: false,
 };
 
 const RegisterPage = () => {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(
-    registerUser,
-    INITIAL_STATE
-  );
+  const [showPassword, setShowPassword] = useState(false);
+  const [state, formAction] = useActionState(registerUser, INITIAL_STATE);
 
   useEffect(() => {
-    const hasNoErrors =
-      state.errors.email === "" && state.errors.password === "";
-
     // 初期状態ではなく、かつエラーがない場合のみ反応
-    if (hasNoErrors && state !== INITIAL_STATE) {
+    if (state.isSuccess) {
       alert("登録が完了しました！");
       router.push("/dashboard");
     }
   }, [state, router]);
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
@@ -61,7 +57,11 @@ const RegisterPage = () => {
               name="email"
               className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
-            {state.errors.email && <p>{state.errors.email}</p>}
+            {state.errors?.email?.map((err, index) => (
+              <p key={index} className="text-red-500 text-xs mt-1">
+                {err}
+              </p>
+            ))}
           </div>
 
           <div className="relative mb-4">
@@ -72,12 +72,26 @@ const RegisterPage = () => {
               パスワード
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
-            {state.errors.password && <p>{state.errors.password}</p>}
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="ml-2 text-sm text-blue-500 hover:underline"
+            >
+              {showPassword ? "非表示" : "表示"}
+            </button>
+
+            {state.errors?.password?.map((err, index) => {
+              return (
+                <p key={index} className="text-red-500 text-xs mt-1">
+                  {err}
+                </p>
+              );
+            })}
           </div>
           <div className="flex flex-row gap-4">
             <button className="flex-1 text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
