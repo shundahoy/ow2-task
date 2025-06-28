@@ -1,8 +1,10 @@
 import React from "react";
 import { LuScanSearch } from "react-icons/lu";
+import { auth } from "@/auth";
 
-const Navbar = () => {
-  const isLogin = false;
+const Navbar = async () => {
+  const session = await auth();
+  const isLogin = !!session?.user;
   return (
     <header className="text-gray-600 body-font">
       <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">

@@ -2,39 +2,46 @@
 import { RegisterFormState } from "@/app/(types)/type";
 import { PrismaClient } from "../../../generated/prisma/client";
 import bcrypt from "bcrypt";
-import { redirect } from "next/navigation";
+import { authValidate } from "../validate/validate";
+import { signIn } from "../../../auth";
 
 export async function registerUser(
   prevState: RegisterFormState,
   formData: FormData
 ) {
   const prisma = new PrismaClient();
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
 
-  if (!email || !password) {
-    return {
-      errors: {
-        email: "emailは必須です",
-        password: "passwordは必須です",
-      },
+  const validateResult = authValidate.safeParse({
+    password: formData.get("password"),
+    email: formData.get("email"),
+  });
+
+  if (!validateResult.success) {
+    const errors = {
+      errors: validateResult.error.flatten().fieldErrors,
       isSuccess: false,
     };
+    return errors;
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
+  const hashedPassword = await bcrypt.hash(validateResult.data.password, 10);
   await prisma.tUser.create({
     data: {
-      email,
+      email: validateResult.data.email,
       password: hashedPassword,
     },
   });
 
+  const result = await signIn("credentials", {
+    redirect: false,
+    email: validateResult.data.email,
+    password: validateResult.data.password,
+  });
+
   return {
     errors: {
-      email: "",
-      password: "",
+      email: [],
+      password: [],
     },
     isSuccess: true,
   };
