@@ -19,7 +19,6 @@ const RegisterPage = () => {
   const [state, formAction] = useActionState(registerUser, INITIAL_STATE);
 
   useEffect(() => {
-    // 初期状態ではなく、かつエラーがない場合のみ反応
     if (state.isSuccess) {
       alert("登録が完了しました！");
       router.push("/dashboard");
@@ -102,6 +101,15 @@ const RegisterPage = () => {
             ※ 登録は無料です。今すぐオーバーウォッチの世界に飛び込みましょう。
           </p>
         </form>
+        <button
+          className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+          onClick={() => {
+            const audio = new Audio("/ryuken.mp3");
+            audio.play();
+          }}
+        >
+          竜剣ボタン
+        </button>
       </div>
     </section>
   );

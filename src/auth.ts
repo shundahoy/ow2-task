@@ -28,7 +28,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // パスワードの検証
           const isValid = await bcrypt.compare(password, user.password);
           if (!isValid) return null;
-          console.log("isvalid" + isValid);
 
           // 認証成功時
           return {

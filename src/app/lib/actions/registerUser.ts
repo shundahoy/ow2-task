@@ -32,7 +32,11 @@ export async function registerUser(
     },
   });
 
-  const result = await signIn("credentials", formData);
+  const result = await signIn("credentials", {
+    redirect: false,
+    email: validateResult.data.email,
+    password: validateResult.data.password,
+  });
 
   return {
     errors: {

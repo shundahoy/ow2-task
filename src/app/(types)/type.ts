@@ -5,3 +5,9 @@ export type RegisterFormState = {
   };
   isSuccess: boolean;
 };
+
+export type LoginFormState = {
+  errors?: {
+    message?: string[];
+  };
+};
