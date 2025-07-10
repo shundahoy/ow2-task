@@ -1,6 +1,7 @@
 import React from "react";
 import { LuScanSearch } from "react-icons/lu";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
+import Link from "next/link";
 
 const Navbar = async () => {
   const session = await auth();
@@ -24,13 +25,29 @@ const Navbar = async () => {
           <span className="ml-3 text-xl">OW2タスク管理表</span>
         </a>
         {isLogin && (
-          <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
-            <a className="mr-5 hover:text-gray-900">
+          <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center gap-5">
+            <a className="hover:text-gray-900">
               <LuScanSearch size="1.5em" />
             </a>
-            <a className="mr-5 hover:text-gray-900">タスク一覧</a>
-            <a className="mr-5 hover:text-gray-900">タスク登録</a>
-            <a className="mr-5 hover:text-gray-900">ログアウト</a>
+            <Link href="/dashboard" className="hover:text-gray-900">
+              タスク一覧
+            </Link>
+            <Link href="/dashboard/create" className="hover:text-gray-900">
+              タスク登録
+            </Link>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <button
+                className="hover:text-gray-900 cursor-pointer"
+                type="submit"
+              >
+                ログアウト
+              </button>
+            </form>
           </nav>
         )}
       </div>

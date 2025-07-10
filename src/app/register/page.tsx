@@ -21,7 +21,7 @@ const RegisterPage = () => {
   useEffect(() => {
     if (state.isSuccess) {
       alert("登録が完了しました！");
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     }
   }, [state, router]);
 
