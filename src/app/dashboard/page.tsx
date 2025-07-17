@@ -4,6 +4,7 @@ import { PrismaClient } from "@/generated/prisma";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale/ja";
 import SearchForm from "../(components)/SearchForm";
+import Link from "next/link";
 
 const DashboardPage = async (props: {
   searchParams?: Promise<{
@@ -54,17 +55,22 @@ const DashboardPage = async (props: {
         {tasks.map((task) => (
           <li
             key={task.task_id}
-            className="flex justify-between gap-x-6 border border-gray-300 rounded-lg px-5 py-3 mb-4"
+            className="border border-gray-300 rounded-lg mb-4"
           >
-            <p>{task.title}</p>
-            <div className="flex min-w-0 gap-x-24">
-              <div>
-                {format(new Date(task.create_date), "yyyy/MM/dd（EEE）", {
-                  locale: ja,
-                })}
+            <Link
+              href={`/dashboard/task/${task.task_id}`}
+              className="flex justify-between gap-x-6 px-5 py-3 hover:bg-gray-100 rounded-lg"
+            >
+              <p className="truncate">{task.title}</p>
+              <div className="flex min-w-0 gap-x-24">
+                <div>
+                  {format(new Date(task.create_date), "yyyy/MM/dd（EEE）", {
+                    locale: ja,
+                  })}
+                </div>
+                <div>{task.status.status_name}</div>
               </div>
-              <div>{task.status.status_name}</div>
-            </div>
+            </Link>
           </li>
         ))}
       </ul>
