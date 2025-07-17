@@ -1,12 +1,29 @@
 "use client";
-import React from "react";
-import { TaskFormProps } from "../(types)/type";
+import React, { useActionState } from "react";
+import { CreateTaskFormState, TaskFormProps } from "../(types)/type";
 import { useState, useEffect, useRef } from "react";
 import { MChar } from "@/generated/prisma";
+import { createTask } from "../lib/actions/registerTask";
+import { useRouter } from "next/navigation";
+
+const INITIAL_STATE: CreateTaskFormState = {
+  errors: {
+    title: [],
+    role_id: [],
+    char_id: [],
+    status_code: [],
+    comment: [],
+  },
+  isSuccess: false,
+};
 
 const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
   const [filteredChars, setFilteredChars] = useState<MChar[]>([]);
   const selectRef = useRef<HTMLSelectElement>(null);
+  const [state, formAction] = useActionState(createTask, INITIAL_STATE);
+  const router = useRouter();
+  const today = new Date().toISOString().split("T")[0];
+
   const autoCharSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedRoleId = Number(e.target.value);
     const activeChars = chars.filter((char) => char.role_id === selectedRoleId);
@@ -20,8 +37,14 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
       selectRef.current.dispatchEvent(event);
     }
   }, []);
+
+  useEffect(() => {
+    if (state.isSuccess) {
+      router.push("/dashboard");
+    }
+  }, [state.isSuccess]);
   return (
-    <form className="space-y-4">
+    <form className="space-y-4" action={formAction}>
       <div>
         <label className="block font-semibold"></label>
         <input
@@ -30,6 +53,11 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
           className="w-full mt-1 border rounded px-3 py-2"
           placeholder="タスクタイトル"
         />
+        {state.errors?.title?.map((err, index) => (
+          <p key={index} className="text-red-500 text-xs mt-1">
+            {err}
+          </p>
+        ))}
       </div>
       <div className="border p-8">
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -47,6 +75,11 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
                 </option>
               ))}
             </select>
+            {state.errors?.role_id?.map((err, index) => (
+              <p key={index} className="text-red-500 text-xs mt-1">
+                {err}
+              </p>
+            ))}
           </div>
 
           <div>
@@ -61,6 +94,11 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
                 </option>
               ))}
             </select>
+            {state.errors?.char_id?.map((err, index) => (
+              <p key={index} className="text-red-500 text-xs mt-1">
+                {err}
+              </p>
+            ))}
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -70,6 +108,7 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
               type="date"
               name="date"
               className="w-full mt-1 border rounded px-3 py-2"
+              defaultValue={today}
             />
           </div>
 
@@ -85,6 +124,11 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
                 </option>
               ))}
             </select>
+            {state.errors?.status_code?.map((err, index) => (
+              <p key={index} className="text-red-500 text-xs mt-1">
+                {err}
+              </p>
+            ))}
           </div>
         </div>
         <div className="mb-4">
@@ -100,6 +144,7 @@ const CreateForm = ({ chars, roles, statuses }: TaskFormProps) => {
         <button
           type="button"
           className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          onClick={() => router.push("/dashboard")}
         >
           キャンセル
         </button>

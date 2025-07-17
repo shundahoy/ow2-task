@@ -1,3 +1,4 @@
+import { MChar, MRole, MStatus } from "@/generated/prisma";
 import { z } from "zod";
 
 const ow2Words = [
@@ -131,3 +132,49 @@ export const authValidate = z.object({
       message: `パスワードには以下のOW2用語を含めてください`,
     }),
 });
+
+export const buildTaskSchema = (
+  roles: MRole[],
+  characters: MChar[],
+  statuses: MStatus[]
+) => {
+  const validRoleIds = roles.map((r) => r.role_id);
+  const validStatuses = statuses.map((s) => s.status_code);
+  const validCharData = characters;
+
+  return z
+    .object({
+      title: z
+        .string()
+        .min(1, { message: "タイトルを入力してください" })
+        .max(50, { message: "タイトルは100文字以内で入力してください" }),
+
+      role_id: z.number().refine((val) => validRoleIds.includes(val), {
+        message: "無効なロールが選択されています",
+      }),
+
+      char_id: z
+        .number()
+        .refine((val) => validCharData.some((c) => c.char_id == val), {
+          message: "無効なキャラクターが選択されています",
+        }),
+
+      status_code: z.number().refine((val) => validStatuses.includes(val), {
+        message: "無効なステータスが選択されています",
+      }),
+
+      comment: z
+        .string()
+        .max(500, { message: "コメントは500文字以内で入力してください" }),
+    })
+    .refine(
+      (data) => {
+        const char = validCharData.find((c) => c.char_id === data.char_id);
+        return !char || char.role_id === data.role_id;
+      },
+      {
+        message: "選択されたキャラクターはロールに対応していません",
+        path: ["character"],
+      }
+    );
+};

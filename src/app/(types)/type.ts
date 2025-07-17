@@ -19,3 +19,14 @@ export type TaskFormProps = {
   roles: MRole[];
   statuses: MStatus[];
 };
+
+export type CreateTaskFormState = {
+  errors?: {
+    title?: string[];
+    role_id?: string[];
+    char_id?: string[];
+    status_code?: string[];
+    comment?: string[];
+  };
+  isSuccess: boolean;
+};
