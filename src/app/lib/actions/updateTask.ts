@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { TaskFormState } from "@/app/(types)/type";
 import { buildTaskSchema } from "../validate/validate";
 
-export async function createTask(
+export async function updateTask(
   prevState: TaskFormState,
   formData: FormData
 ): Promise<TaskFormState> {
@@ -15,6 +15,11 @@ export async function createTask(
 
   if (!userId) {
     throw new Error("ログインしていません");
+  }
+
+  const taskId = Number(formData.get("taskId"));
+  if (!taskId) {
+    throw new Error("タスクIDが未設定です");
   }
 
   const roles = await prisma.mRole.findMany();
@@ -40,20 +45,21 @@ export async function createTask(
 
   const dateStr = formData.get("date")?.toString();
   const create_date =
-    dateStr && dateStr !== ""
-      ? new Date(new Date(dateStr).getTime() + 9 * 60 * 60 * 1000)
-      : new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+    dateStr && dateStr !== "" ? new Date(dateStr) : new Date();
 
   try {
-    await prisma.tTask.create({
+    await prisma.tTask.update({
+      where: {
+        task_id: taskId,
+      },
       data: {
-        title: result.data?.title,
+        title: result.data?.title ?? "",
         user_id: userId,
-        role_id: result.data?.role_id,
-        char_id: result.data?.char_id,
-        status_code: result.data?.status_code,
+        role_id: result.data?.role_id ?? 0,
+        char_id: result.data?.char_id ?? 0,
+        status_code: result.data?.status_code ?? 0,
         create_date: create_date,
-        comment: result.data?.comment,
+        comment: result.data?.comment ?? "",
       },
     });
 

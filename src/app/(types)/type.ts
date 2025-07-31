@@ -1,4 +1,4 @@
-import type { MChar, MRole, MStatus } from "@/generated/prisma";
+import type { MChar, MRole, MStatus, TTask } from "@/generated/prisma";
 
 export type RegisterFormState = {
   errors?: {
@@ -14,13 +14,20 @@ export type LoginFormState = {
   };
 };
 
-export type TaskFormProps = {
+export type CreateTaskFormProps = {
   chars: MChar[];
   roles: MRole[];
   statuses: MStatus[];
 };
 
-export type CreateTaskFormState = {
+export type UpdateTaskFormProps = {
+  chars: MChar[];
+  roles: MRole[];
+  statuses: MStatus[];
+  task: TTask;
+};
+
+export type TaskFormState = {
   errors?: {
     title?: string[];
     role_id?: string[];

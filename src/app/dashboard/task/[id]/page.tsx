@@ -3,6 +3,8 @@ import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import Link from "next/link";
+
+import DeleteButton from "@/app/(components)/DeleteButton";
 export default async function TaskDetailPage(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -79,17 +81,21 @@ export default async function TaskDetailPage(props: {
 
       <div className="flex justify-between">
         <Link
-          href={`/dashboard/task/${task.task_id}/edit`}
+          href="/dashboard"
           className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700"
         >
-          編集
+          キャンセル
         </Link>
-        <Link
-          href="/dashboard"
-          className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-        >
-          完了
-        </Link>
+        <div className="flex gap-4">
+          <Link
+            href={`/dashboard/task/${task.task_id}/edit`}
+            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+          >
+            編集
+          </Link>
+
+          <DeleteButton taskId={task.task_id} />
+        </div>
       </div>
     </div>
   );
