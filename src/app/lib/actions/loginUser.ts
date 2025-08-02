@@ -18,13 +18,13 @@ export async function login(prevState: LoginFormState, formData: FormData) {
         case "CredentialsSignin":
           return {
             errors: {
-              message: ["認証に失敗しました"],
+              message: ["認証に失敗しました", error.type],
             },
           };
         default:
           return {
             errors: {
-              message: ["認証に失敗しました"],
+              message: ["認証に失敗しました", error.type],
             },
           };
       }
