@@ -5,14 +5,12 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 const main = async () => {
-  // 既存データを削除
-  await prisma.mRole.deleteMany();
-  await prisma.mChar.deleteMany();
-  await prisma.mStatus.deleteMany();
-  await prisma.tUser.deleteMany();
+  // 既存データを削除（順番に注意）
   await prisma.tTask.deleteMany();
-  await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'TUser';`;
-  await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'TTask';`;
+  await prisma.tUser.deleteMany();
+  await prisma.mChar.deleteMany();
+  await prisma.mRole.deleteMany();
+  await prisma.mStatus.deleteMany();
 
   // ロール型定義
   type Role = {
@@ -63,7 +61,7 @@ const main = async () => {
     ],
   });
 
-  // ユーザー登録（ハッシュ付き）
+  // ユーザー登録（パスワードをハッシュ化）
   const hashedPassword = await bcrypt.hash("password123", 10);
   const user = await prisma.tUser.create({
     data: {
@@ -72,46 +70,47 @@ const main = async () => {
     },
   });
 
-  // タスク
-  await prisma.tTask.create({
-    data: {
-      user_id: user.user_id,
-      title: "テストタスク1",
-      role_id: 1,
-      char_id: 8,
-      status_code: 1,
-      comment: "タンク練習してね",
-      create_date: "1970-01-01T00:00:00.000Z",
-    },
-  });
-  await prisma.tTask.create({
-    data: {
-      user_id: user.user_id,
-      title: "テストタスク2",
-      role_id: 2,
-      char_id: 11,
-      status_code: 2,
-      comment: "DPS練習してね",
-      create_date: "1970-01-01T00:00:00.000Z",
-    },
-  });
-  await prisma.tTask.create({
-    data: {
-      user_id: user.user_id,
-      title: "テストタスク3",
-      role_id: 3,
-      char_id: 18,
-      status_code: 3,
-      comment: "サポート練習してね",
-      create_date: "1970-01-01T00:00:00.000Z",
-    },
+  // タスク登録
+  await prisma.tTask.createMany({
+    data: [
+      {
+        user_id: user.user_id,
+        title: "テストタスク1",
+        role_id: 1,
+        char_id: 8,
+        status_code: 1,
+        comment: "タンク練習してね",
+        create_date: new Date("1970-01-01T00:00:00.000Z"),
+      },
+      {
+        user_id: user.user_id,
+        title: "テストタスク2",
+        role_id: 2,
+        char_id: 11,
+        status_code: 2,
+        comment: "DPS練習してね",
+        create_date: new Date("1970-01-01T00:00:00.000Z"),
+      },
+      {
+        user_id: user.user_id,
+        title: "テストタスク3",
+        role_id: 3,
+        char_id: 18,
+        status_code: 3,
+        comment: "サポート練習してね",
+        create_date: new Date("1970-01-01T00:00:00.000Z"),
+      },
+    ],
   });
 };
 
 // 実行
 main()
+  .then(() => {
+    console.log("✅ Seeding complete");
+  })
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {
