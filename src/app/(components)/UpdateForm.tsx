@@ -45,7 +45,7 @@ const UpdateForm = ({ chars, roles, statuses, task }: UpdateTaskFormProps) => {
     const activeChars = filterCharsByRole(task.role_id);
     setFilteredChars(activeChars);
     setSelectedCharId(task.char_id);
-  }, [task.role_id]);
+  }, [task.role_id, state]);
 
   useEffect(() => {
     if (state.isSuccess) {
